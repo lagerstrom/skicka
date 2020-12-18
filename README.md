@@ -38,7 +38,8 @@ the first log message will the your local IP and what port it is running on. By 
 
 Send your IP address showed in the first message to your friend on the local network and ask them to connect to port 8000. If no IP address is shown in the first message, just check what your local IP address is and send it to your friend. Open a browser and go to the IP address. See screenshot below when I access localhost on port 8000 having `skicka` running on localhost.
 
-![image](https://user-images.githubusercontent.com/10521486/102618013-567eef00-413a-11eb-8769-4766a68cf502.png)
+<img src="https://user-images.githubusercontent.com/10521486/102618013-567eef00-413a-11eb-8769-4766a68cf502.png"  width="400" height="400" />
+
 
 
 Now your friend can just drag and drop any file and it will be uploaded to your computer. The files will be saved in `/tmp/skicka`
