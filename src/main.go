@@ -18,7 +18,7 @@ import (
 
 const (
 	mediaDirectory = "/tmp/skicka/"
-	serverPort = 8000
+	serverPort     = 8000
 )
 
 var (
