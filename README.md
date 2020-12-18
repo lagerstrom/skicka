@@ -41,7 +41,7 @@ Send your IP address showed in the first message to your friend on the local net
 ![image](https://user-images.githubusercontent.com/10521486/102618013-567eef00-413a-11eb-8769-4766a68cf502.png)
 
 
-Now your friend can just drag and drop any file and it will be uploaded to your computer. The files will be saved in `/tmp/media`
+Now your friend can just drag and drop any file and it will be uploaded to your computer. The files will be saved in `/tmp/skicka`
 
 
 ## Use with ngrok

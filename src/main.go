@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	mediaDirectory = "/tmp/media/"
+	mediaDirectory = "/tmp/skicka/"
 	serverPort = 8000
 )
 
