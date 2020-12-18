@@ -110,7 +110,6 @@ func initMediaFolder() error {
 	}
 
 	if err != nil {
-		logger.WithError(err).Error("unable to stat media directory")
 		return err
 	}
 
