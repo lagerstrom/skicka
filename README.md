@@ -20,13 +20,13 @@ You will now have the binary `skicka` built and placed inside the `bin` director
 
 ## Use skicka
 
-When the binary is compiled all the html/js/css files are embedded into the binary so it can be moved to whatever place you see fit. When you start skicka from your teminal like this
+When the binary is compiled all the html/js/css files are embedded into the binary so it can be moved to whatever place you see fit. Start skicka from your teminal like this
 
 ```text
 $ ./bin/skicka
 ```
 
-the first log message will the your local IP and what port it is running on. By default it is running on port 8000.
+the first log message will include your local IP-address and what port it is running on. By default it is running on port 8000.
 
 ```json
 {
@@ -36,7 +36,7 @@ the first log message will the your local IP and what port it is running on. By 
 }
 ```
 
-Send your IP address showed in the first message to your friend on the local network and ask them to connect to port 8000. If no IP address is shown in the first message, just check what your local IP address is and send it to your friend. Open a browser and go to the IP address. See screenshot below when I access localhost on port 8000 having `skicka` running on localhost.
+Send your IP address shown in the first message to your friend on the local network and ask them to connect to port 8000. If no IP address is shown in the first message, just check what your local IP address is and send it to your friend. Open a browser and go to the IP address. See screenshot below when I access localhost on port 8000 having `skicka` running on localhost.
 
 <img src="https://user-images.githubusercontent.com/10521486/102618013-567eef00-413a-11eb-8769-4766a68cf502.png"  width="400" height="400" />
 
