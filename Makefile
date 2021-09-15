@@ -8,7 +8,7 @@ dirs:
 .PHONY: build
 build: dirs
 	@cd src; \
-	packr2; \
+	$(GOPATH)/bin/packr2; \
 	go build -o ../bin/skicka
 	@echo "build successful"
 
