@@ -2,6 +2,24 @@
 File transfer software, creates your local webserver that files can be uploaded to
 
 
+## Use docker
+
+If you have docker installed you can run the following command to build the container
+
+```text
+$ make build-docker
+```
+
+then when the build is complete you can run the following command
+
+```text
+$ make run-docker
+```
+
+It will start the docker container. The first line will be your local IP. Your files will be saved in in the /tmp/skicka directory.
+
+If you want to compile the binary yourself. Follow the instruction below.
+
 ## Install dependencies
 
 First you need to install make then run
