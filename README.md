@@ -55,6 +55,13 @@ Send your IP address shown in the first message to your friend on the local netw
 
 Now your friend can just drag and drop any file and it will be uploaded to your computer. The files will be saved in `/tmp/skicka`
 
+## Skicka configuration
+
+If you want to change the default media directory or maybe what port skicka should listen to. You can do that by setting config flags. To get a list of all the configuration flags skicka supports.
+
+```text
+./bin/skicka --help
+```
 
 ## Use with ngrok
 
