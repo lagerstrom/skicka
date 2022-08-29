@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/lagerstrom/skicka/static"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/lagerstrom/skicka/static"
 )
 
 const (
