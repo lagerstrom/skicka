@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/lagerstrom/skicka/static"
 )
 
 const (
@@ -144,13 +144,11 @@ func main() {
 		return
 	}
 
-	box := packr.New("staticBox", "../html")
-
 	muxRoutes := mux.NewRouter()
 	muxRoutes.HandleFunc("/upload", uploadHandler).
 		Methods("POST")
 
-	muxRoutes.PathPrefix("/").Handler(http.FileServer(box))
+	muxRoutes.PathPrefix("/").Handler(static.StaticPageHandler())
 
 	logger.Infof("IP-address: %s Port: %d", getLocalIp(), serverPort)
 	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", serverPort), muxRoutes))

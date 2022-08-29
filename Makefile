@@ -9,22 +9,13 @@ dirs:
 
 .PHONY: build
 build: dirs
-	@cd src; \
-	$(GOPATH)/bin/packr2; \
-	packr2 build -o ../bin/skicka
+	go build -o $(BIN_DIR)/skicka src/main.go
 	@echo "build successful"
 
 .PHONY: clean
 clean:
 	@if [ -d "bin" ]; then rm -r bin; fi
-	@cd src; packr2 clean
 	@echo "clean successful"
-
-.PHONY: setup
-setup:
-	go get -u github.com/gobuffalo/packr/v2/packr2
-	@echo ""
-	@echo "setup successful"
 
 .PHONY: build-docker
 build-docker:
