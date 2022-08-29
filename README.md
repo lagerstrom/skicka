@@ -23,8 +23,6 @@ If you want to compile the binary yourself. Follow the instruction below.
 
 ## Build the skicka binary
 
-## Build the application
-
 ```text
 $ make build
 ```
