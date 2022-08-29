@@ -1,5 +1,6 @@
 # skicka
-File transfer software, creates your local webserver that files can be uploaded to
+Makes it easy to transfer files over the network to your local machine. Functions
+as your local webserver that files can be uploaded to.
 
 
 ## Use docker
@@ -20,13 +21,7 @@ It will start the docker container. The first line will be your local IP. Your f
 
 If you want to compile the binary yourself. Follow the instruction below.
 
-## Install dependencies
-
-First you need to install make then run
-
-```text
-$ make setup
-```
+## Build the skicka binary
 
 ## Build the application
 
