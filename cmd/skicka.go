@@ -145,8 +145,8 @@ func main() {
 		cfgNamespace = "SKICKA"
 	)
 	var cfg struct {
-		MediaDir string `conf:"default:/tmp/skicka"`
-		Port     int    `conf:"default:8000"`
+		MediaDir string `conf:"default:/tmp/skicka,short:m"`
+		Port     int    `conf:"default:8000,short:p"`
 	}
 	if err := conf.Parse(os.Args[1:], cfgNamespace, &cfg); err != nil {
 		if errors.Is(err, conf.ErrHelpWanted) {
