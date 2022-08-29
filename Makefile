@@ -9,7 +9,7 @@ dirs:
 
 .PHONY: build
 build: dirs
-	go build -o $(BIN_DIR)/skicka src/main.go
+	go build -o $(BIN_DIR)/skicka cmd/skicka.go
 	@echo "build successful"
 
 .PHONY: clean

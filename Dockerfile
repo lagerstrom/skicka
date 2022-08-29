@@ -7,12 +7,12 @@
 FROM golang:1.16 as builder
 WORKDIR /go/src/app/
 
-COPY src ./src
+COPY cmd ./cmd
 COPY static ./static
 COPY go.mod .
 COPY go.sum .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o skicka src/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o skicka cmd/skicka.go
 
 FROM scratch
 
