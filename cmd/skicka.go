@@ -10,23 +10,22 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ardanlabs/conf"
 	"github.com/gorilla/mux"
-	"github.com/lagerstrom/skicka/static"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/lagerstrom/skicka/static"
 )
 
-const (
-	mediaDirectory = "/tmp/skicka/"
-	serverPort     = 8000
-)
-
-var (
-	logger *logrus.Logger
-)
+// uploadHandler object with all dependencies to handle a file upload request
+type uploadHandler struct {
+	mediaDir string
+	logger   *logrus.Logger
+}
 
 // respond responds with the given status and payload. The payload is marshaled to json.
-func respond(w http.ResponseWriter, status int, payload interface{}) {
+func respond(w http.ResponseWriter, status int, payload interface{}, logger *logrus.Logger) {
 
 	var b []byte
 	if payload != nil {
@@ -47,62 +46,63 @@ func respond(w http.ResponseWriter, status int, payload interface{}) {
 	}
 }
 
-// uploadHandler the handler responsible for file uploads
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Info("File Upload Endpoint Hit")
+// handler responsible for file uploads
+func (uh *uploadHandler) handler(w http.ResponseWriter, r *http.Request) {
+	uh.logger.Info("File Upload Endpoint Hit")
 
 	// FormFile returns the first file for the given key `myFile`
 	// it also returns the FileHeader so we can get the Filename,
 	// the Header and the size of the file
 	file, handler, err := r.FormFile("file")
 	if err != nil {
-		logger.WithError(err).Error("Error Retrieving the File")
+		uh.logger.WithError(err).Error("Error Retrieving the File")
 		return
 	}
 	defer file.Close()
 
-	logger.Infof("Uploaded File: %s", handler.Filename)
-	logger.Infof("File Size: %d", handler.Size)
-	fullFilePath := filepath.Join(mediaDirectory, handler.Filename)
+	uh.logger.Infof("Uploaded File: %s", handler.Filename)
+	uh.logger.Infof("File Size: %d", handler.Size)
+	fullFilePath := filepath.Join(uh.mediaDir, handler.Filename)
 
 	_, err = os.Stat(fullFilePath)
 	if err == nil {
-		respond(w, http.StatusSeeOther, "file already exists")
+		respond(w, http.StatusSeeOther, "file already exists", uh.logger)
 		return
 	}
 
 	uploadFile, err := os.Create(fullFilePath)
 	if err != nil {
-		logger.WithError(err).Error("unable to create file")
-		respond(w, http.StatusInternalServerError, "unable to create file on filesystem")
+		uh.logger.WithError(err).Error("unable to create file")
+		respond(w, http.StatusInternalServerError, "unable to create file on filesystem", uh.logger)
 		return
 	}
 	defer uploadFile.Close()
 
 	_, err = io.Copy(uploadFile, file)
 	if err != nil {
-		logger.WithError(err).Error("unable to copy file upload to filesystem")
-		respond(w, http.StatusInternalServerError, "unable to upload file")
+		uh.logger.WithError(err).Error("unable to copy file upload to filesystem")
+		respond(w, http.StatusInternalServerError, "unable to upload file", uh.logger)
 		return
 	}
 
 	// return that we have successfully uploaded our file!
-	logger.Infof("%s uploaded successfully", fullFilePath)
-	respond(w, http.StatusCreated, "file upload successful")
+	uh.logger.Infof("%s uploaded successfully", fullFilePath)
+	respond(w, http.StatusCreated, "file upload successful", uh.logger)
 }
 
 // initLogger inits the logger
-func initLogger() {
-	logger = logrus.New()
+func initLogger() *logrus.Logger {
+	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetOutput(os.Stdout)
+	return logger
 }
 
 // initMediaFolder created media dir if not exists and does a couple of small checks
-func initMediaFolder() error {
-	dirInfo, err := os.Stat(mediaDirectory)
+func initMediaFolder(mediaDir string, logger *logrus.Logger) error {
+	dirInfo, err := os.Stat(mediaDir)
 	if os.IsNotExist(err) {
-		err = os.Mkdir(mediaDirectory, 0755)
+		err = os.Mkdir(mediaDir, 0755)
 		if err != nil {
 			logger.WithError(err).Error("unable to create media dir")
 		}
@@ -137,19 +137,46 @@ func getLocalIp() string {
 }
 
 func main() {
-	initLogger()
+	logger := initLogger()
 
-	if err := initMediaFolder(); err != nil {
+	// ====================================
+	// Checks user configuration
+	const (
+		cfgNamespace = "SKICKA"
+	)
+	var cfg struct {
+		MediaDir string `conf:"default:/tmp/skicka"`
+		Port     int    `conf:"default:8000"`
+	}
+	if err := conf.Parse(os.Args[1:], cfgNamespace, &cfg); err != nil {
+		if errors.Is(err, conf.ErrHelpWanted) {
+			usage, err := conf.Usage(cfgNamespace, &cfg)
+			if err != nil {
+				logger.WithError(err).Error("unable to generate config usage")
+				return
+			}
+			fmt.Println(usage)
+			return
+		}
+		logger.WithError(err).Error("unable to parse config")
+		return
+	}
+
+	if err := initMediaFolder(cfg.MediaDir, logger); err != nil {
 		logger.WithError(err).Error("unable to init media dir")
 		return
 	}
 
-	muxRoutes := mux.NewRouter()
-	muxRoutes.HandleFunc("/upload", uploadHandler).
-		Methods("POST")
+	uh := uploadHandler{
+		mediaDir: cfg.MediaDir,
+		logger: logger,
+	}
 
+	muxRoutes := mux.NewRouter()
+	muxRoutes.HandleFunc("/upload", uh.handler).
+		Methods("POST")
 	muxRoutes.PathPrefix("/").Handler(static.StaticPageHandler())
 
-	logger.Infof("IP-address: %s Port: %d", getLocalIp(), serverPort)
-	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", serverPort), muxRoutes))
+	logger.Infof("IP-address: %s Port: %d", getLocalIp(), cfg.Port)
+	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), muxRoutes))
 }
