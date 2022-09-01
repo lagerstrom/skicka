@@ -48,7 +48,7 @@ func respond(w http.ResponseWriter, status int, payload interface{}, logger *log
 
 // handler responsible for file uploads
 func (uh *uploadHandler) handler(w http.ResponseWriter, r *http.Request) {
-	uh.logger.Info("File Upload Endpoint Hit")
+	uh.logger.Debug("File Upload Endpoint Hit")
 
 	// FormFile returns the first file for the given key `myFile`
 	// it also returns the FileHeader so we can get the Filename,
@@ -60,8 +60,10 @@ func (uh *uploadHandler) handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	uh.logger.Infof("Uploaded File: %s", handler.Filename)
-	uh.logger.Infof("File Size: %d", handler.Size)
+	uh.logger.
+		WithField("file_size", fmt.Sprintf("%d bytes", handler.Size)).
+		WithField("file_name", handler.Filename).
+		Info("file is about to be uploaded")
 	fullFilePath := filepath.Join(uh.mediaDir, handler.Filename)
 
 	_, err = os.Stat(fullFilePath)
@@ -147,6 +149,7 @@ func main() {
 	var cfg struct {
 		MediaDir string `conf:"default:/tmp/skicka,short:m"`
 		Port     int    `conf:"default:8000,short:p"`
+		Debug    bool   `conf:"default:false"`
 	}
 	if err := conf.Parse(os.Args[1:], cfgNamespace, &cfg); err != nil {
 		if errors.Is(err, conf.ErrHelpWanted) {
@@ -160,6 +163,10 @@ func main() {
 		}
 		logger.WithError(err).Error("unable to parse config")
 		return
+	}
+
+	if cfg.Debug {
+		logger.SetLevel(logrus.DebugLevel)
 	}
 
 	if err := initMediaFolder(cfg.MediaDir, logger); err != nil {
