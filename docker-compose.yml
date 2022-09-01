@@ -1,0 +1,9 @@
+version: '3'
+services:
+  app:
+    image: alagerstrom/skicka:1.0
+    restart: "no"
+    ports:
+      - "8000:8000"
+    volumes:
+      - /tmp/skicka:/tmp/skicka
