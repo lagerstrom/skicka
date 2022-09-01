@@ -46,6 +46,23 @@ func respond(w http.ResponseWriter, status int, payload interface{}, logger *log
 	}
 }
 
+// getFileName checks if a file exists with the same name. If it does it will give the file a new name
+// that new name will add (n) to the end of the file before the extension.
+func getFileName(fp string) (string, error) {
+	originalFp := fp
+	var i int
+	for {
+		if _, err := os.Stat(fp); err != nil {
+			return fp, nil
+		}
+		fp = originalFp
+		extension := filepath.Ext(fp)
+		noExFp := fp[:len(fp)-len(extension)]
+		fp = fmt.Sprintf("%s(%d)%s", noExFp, i, extension)
+		i += 1
+	}
+}
+
 // handler responsible for file uploads
 func (uh *uploadHandler) handler(w http.ResponseWriter, r *http.Request) {
 	uh.logger.Debug("File Upload Endpoint Hit")
@@ -66,9 +83,10 @@ func (uh *uploadHandler) handler(w http.ResponseWriter, r *http.Request) {
 		Info("file is about to be uploaded")
 	fullFilePath := filepath.Join(uh.mediaDir, handler.Filename)
 
-	_, err = os.Stat(fullFilePath)
-	if err == nil {
-		respond(w, http.StatusSeeOther, "file already exists", uh.logger)
+	fullFilePath, err = getFileName(fullFilePath)
+	if err != nil {
+		uh.logger.WithError(err).Error("unable to generate full file path")
+		respond(w, http.StatusInternalServerError, "unable to generate file path", uh.logger)
 		return
 	}
 
@@ -88,7 +106,7 @@ func (uh *uploadHandler) handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return that we have successfully uploaded our file!
-	uh.logger.Infof("%s uploaded successfully", fullFilePath)
+	uh.logger.WithField("file_name", fullFilePath).Info("file successfully uploaded")
 	respond(w, http.StatusCreated, "file upload successful", uh.logger)
 }
 
